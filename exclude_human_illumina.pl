@@ -1,0 +1,33 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+
+my $sam = shift @ARGV;
+my ($prefix,$end) = split(/\./,$sam);
+my $tmp = "$prefix\.tmp";
+print "STEP 1: F 12\n";
+system "samtools view -b -1 -O BAM -o $tmp -U $prefix\_F12.bam -F 12 -@ 20 $sam";
+my $F_count = `samtools view -c $tmp`;
+chomp($F_count);
+print "Excluded $F_count primary aligned reads\n";
+print "STEP 2: f 256\n";
+system "samtools view -O BAM -b -1 -o $tmp -U $prefix\_f256.bam -f 256 -@ 20 $prefix\_F12.bam";
+my $sec_count = `samtools view -c $tmp`;
+chomp($sec_count);
+print "Excluded $sec_count secondary aligned reads\n";
+print "STEP 3: f 2048\n";
+system "samtools view -O BAM -b -1 -o $tmp -U $prefix\_f2048.bam -f 2048 -@ 20 $prefix\_f256.bam";
+my $sup_count = `samtools view -c $tmp`;
+chomp($sup_count);
+print "Excluded $sup_count supplementary aligned reads\n";
+print "STEP 4: f 2\n";
+system "samtools view -O BAM -b -1 -o $tmp -U $prefix\_f2.bam -f 2 -@ 20 $prefix\_f2048.bam";
+my $pair_count = `samtools view -c $tmp`;
+chomp($pair_count);
+print "Excluded $pair_count properly paired aligned reads\n";
+system "rm $tmp";
+print "STEP 5: collate\n";
+system "samtools collate --output-fmt BAM -u -@ 20 -o $prefix\_collated.bam $prefix\_f2.bam";
+print "STEP 6: fastq\n";
+system "samtools fastq -1 $prefix\_filt_1.fastq.gz -2 $prefix\_filt_2.fastq.gz -n -@ 20 -0 /dev/null -s /dev/null $prefix\_collated.bam";
+system "rm $prefix\*\.bam";
