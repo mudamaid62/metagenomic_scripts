@@ -10,6 +10,6 @@ This text is unformated
 use warnings;
 use strict;
 ```
-~~TESTING IF THE CREDENTIALS WERE SAVED~~
-**Please do not read this bold text**
-*And neither this italized text* 
+~~ TESTING IF THE CREDENTIALS WERE SAVED ~~
+** Please do not read this bold text **
+* And neither this italized text * 
