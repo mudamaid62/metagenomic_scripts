@@ -44,7 +44,7 @@ perl plass_orf_filter.pl [assembly.faa] [PREFIX] [minimun protein length] [maxim
 	- [PREFIX]_semi-partial_orfs.faa
 	- [PREFIX]_partial_orfs.faa
 
-## Assmble your reads using metaSPAdes and filter out short contigs
+## Assemble your reads using metaSPAdes and filter out short contigs
 
 1. Run **metaSPAdes** using your reads
 
@@ -57,3 +57,30 @@ metaspades.py -o [metaspades_assembly] -1 [R1] -2 [R2] -t 16 -m [RAM in Gb]
 ```
 perl filter_by_length.pl metaspades_assembly/contigs.fasta [minimun contig length] [maximun contig length] > [filtered_assembly.fa]
 ```
+
+## Run SingleM to obtain community profiles, and then, use ESCGs to calculate alpha-diversity metrics
+
+1. Run **SingleM** in pipe mode to obtain the community profile and OTU table
+
+```
+singlem pipe -1 [R1] -2 [R2] -p [taxonomic_profile] --otu-table [OTU_table] --threads 16
+```
+
+2. Summarise the profile output in tables by taxonomic levels, to then plot community stack plots. You can summarise multiple profile outputs at once.
+
+```
+singlem summarise --input-taxonomic-profiles [taxonomic_profiles] --output-species-by-site-relative-abundance-prefix [PREFIX]
+```
+
+3. Summarise the OTU table output by ESCG, to then calculate alpha-diversity metrics. You can summarise multiple OTU tables at once.
+
+```
+singlem summarise --input-otu-tables [OTU_tables] --cluster --unifrac-by-otu [PREFIX]
+```
+
+4. The previous command generates 59 summarised OTU tables using the PREFIX, one for each ESCG. Then, run **get_indices_from_unifrac_tables.pl** for each ESCG
+
+```
+for i in PREFIX*; do perl get_indices_from_unifrac_tables.pl "$i" > "$i"_alpha_diversity_indices; done
+```
+
