@@ -114,3 +114,34 @@ perl get_relevant_clusters_list_v2.pl all_DB_clu.tsv BLDB_list > relevant_cluste
 cut -f 2 relevant_clusters > relevant_proteins
 perl get_esm_fasta.pl all_DB relevant_proteins temp_dir > relevant_proteins.faa
 ```
+
+## Quantify genes/proteins in copies/cell and get related taxonomies
+
+1. Run **CAT** with metaSPAdes assembled contigs to get classify contig taxonomic classifications
+
+```
+CAT_pack contigs -c metaspades_contigs.fa -d cat_database/db/ -t cat_database/tax/ --no_stars -n 16 --sensitive --block_size 2 --tmpdir temp -o contigs_CAT
+```
+
+2. Use **ARGs_OAP** to build a database from a Proteins to quantify multifasta 
+
+```
+args_oap make_db -i proteins.faa
+```
+
+3. Run **ARGs_OAP** to get reads that map to the proteins to quantify. 
+-Read files must be in a single directory and be called sample_name_1.fastq.gz and sample_name_2.fastq.gz
+-Create a structure file for your proteins (tab-separated), where the first column has the header Protein and all protein names, and any ammount of extra columns (at least one) where cluster types are specicified
+	e.g.
+		Protein	Cluster
+		prot_A	cluster_A
+		prot_B	cluster_A
+		prot_C	cluster_B
+		prot_D	cluster_B
+
+```
+args_oap stage_one -i [reads_directory] -o [args_oap_out] -t 16 -f fastq --database proteins.faa
+args_oap stage_two -i [args_oap_out]  -t 16 --database proteins.faa --structure1 proteins_structure.txt
+```
+
+4. Run **fasta_to_fastq.pl** to recover the reads from the args_oap output
