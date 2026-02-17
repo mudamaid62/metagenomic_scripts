@@ -84,7 +84,7 @@ singlem summarise --input-otu-tables [OTU_tables] --cluster --unifrac-by-otu [PR
 for i in PREFIX*; do perl get_indices_from_unifrac_tables.pl "$i" > "$i"_alpha_diversity_indices; done
 ```
 
-## Cluster a protein dataset, recover the clusters containing relevant proteins, and then, the proteins in those clusters
+## Cluster a protein dataset, recover the clusters containing relevant proteins, and then, retrieve the proteins in those clusters
 
 1. Start with a protein multifasta file of relevant proteins to search, e.g. the BLDB database. Get the protein names
 
