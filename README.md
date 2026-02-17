@@ -1,21 +1,25 @@
-# metagenomic_scripts
+# Metagenomic Scripts
 Custom perl scripts used to calculate diversity indices, functional similarities and other related stuff
  
-# TEST HEADER
-## This is a test
-### This is a smaller text
-This text is unformated
+## Filter out human contamination from metagenomic reads
+
+1. First, check your Illumina reads using **FASTQC**, and determine your read length and how many low quality bases are both on the front and tail of the reads.
+
+2. Run **fastp**, we will assumme that both the front and tail have 5 low quality bases, and that our reads are 150 bp, using 16 threads. 
 
 ```
-#!/usr/bin/perl
-use warnings;
-use strict;
+fastp --in1 [R1] --in2 [R2] --out1 [trimmed_R1] --out2 [trimmed_R2] -z 9 -V -f 5 -F 5 -D --dup_calc_accuracy 6 -l 140 -c -w 16
 ```
 
-~~TESTING IF THE CREDENTIALS WERE SAVED.~~
+3. Map the trimmed reads to the GRCh38 human genome reference using **bwa-mem2**
 
-**Please do not read this bold text.**
+```
+bwa-mem2 mem -o [mapping.sam] -t 16 [GRCh38 reference] [trimmed_R1] [trimmed_R2]
+```
 
-*And neither this italized text.* 
+4. Filter out the human contamination using **exclude_human_illumina.pl**
 
-Hello Camilo
+```
+perl /media/databases/exclude_human_illumina.pl [mapping.sam]
+```
+5. Your reads are now ready for further analysis and/or assembly. Delete [mapping.sam]
