@@ -13,7 +13,7 @@ my @prots = read_p($interest);
 my @reps;
 my %database;
 
-print "Cluster_representative\tProtein\tDatabase\n";
+#print "Cluster_representative\tProtein\tDatabase\n";
 foreach my $p(@prots){
 	$database{$p} = "Reference DB";
 	print STDERR "Searching cluster containing $p\n";
