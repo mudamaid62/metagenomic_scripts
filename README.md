@@ -130,8 +130,9 @@ args_oap make_db -i proteins.faa
 ```
 
 3. Run **ARGs_OAP** to get reads that map to the proteins to quantify. 
--Read files must be in a single directory and be called sample_name_1.fastq.gz and sample_name_2.fastq.gz
--Create a structure file for your proteins (tab-separated), where the first column has the header Protein and all protein names, and any ammount of extra columns (at least one) where cluster types are specicified
+
+- Read files must be in a single directory and be called sample_name_1.fastq.gz and sample_name_2.fastq.gz
+- Create a structure file for your proteins (tab-separated), where the first column has the header Protein and all protein names, and any ammount of extra columns (at least one) where cluster types are specicified
 	e.g.
 		Protein	Cluster
 		prot_A	cluster_A
