@@ -22,6 +22,7 @@ bwa-mem2 mem -o [mapping.sam] -t 16 [GRCh38 reference] [trimmed_R1] [trimmed_R2]
 ```
 perl /media/databases/exclude_human_illumina.pl [mapping.sam]
 ```
+
 5. Your reads are now ready for further analysis and/or assembly. Delete [mapping.sam]
 
 ## Assemble your reads using PLASS and filter out partial proteins
@@ -37,8 +38,22 @@ plass assemble [R1] [R2] [assembly.faa] [temp_dir] --remove-tmp-files
 ```
 perl plass_orf_filter.pl [assembly.faa] [PREFIX] [minimun protein length] [maximum protein length]
 ```
+
 3. After the script is done, you will have 3 output in your current directory. [PREFIX]_complete_orfs.faa is the one appropiate for further usage.
 	- [PREFIX]_complete_orfs.faa
 	- [PREFIX]_semi-partial_orfs.faa
 	- [PREFIX]_partial_orfs.faa
 
+## Assmble your reads using metaSPAdes and filter out short contigs
+
+1. Run **metaSPAdes** using your reads
+
+```
+metaspades.py -o [metaspades_assembly] -1 [R1] -2 [R2] -t 16 -m [RAM in Gb]
+```
+
+2. Filter out short contigs using **filter_by_length.pl**
+
+```
+perl filter_by_length.pl metaspades_assembly/contigs.fasta [minimun contig length] [maximun contig length] > [filtered_assembly.fa]
+```
