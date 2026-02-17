@@ -84,3 +84,33 @@ singlem summarise --input-otu-tables [OTU_tables] --cluster --unifrac-by-otu [PR
 for i in PREFIX*; do perl get_indices_from_unifrac_tables.pl "$i" > "$i"_alpha_diversity_indices; done
 ```
 
+## Cluster a protein dataset, recover the clusters containing relevant proteins, and then, the proteins in those clusters
+
+1. Start with a protein multifasta file of relevant proteins to search, e.g. the BLDB database. Get the protein names
+
+```
+grep ">" BLDB.faa > BLDB_list
+sed -i 's/>//g' BLDB_list
+```
+
+2. Cluster your relevant proteins and some problem proteins, e.g. PLASS assembled metagenomic proteins, using **MMSeqs2**
+
+```
+mmseqs createdb BLDB.faa PLASS.faa all_DB
+mmseqs linclust all_DB all_DB_clu tmp --alignment-mode 3 --min-seq-id [Minimum identity] -c [Minimun bidirectional coverage] --cov-mode 0 --cluster-mode 2 --threads 16 --realign --remove-tmp-files
+mmseqs createsubdb all_DB_clu all_DB all_DB_clu_rep
+mmseqs createtsv all_DB all_DB all_DB_clu all_DB_clu.tsv --full-header
+```
+
+3. Recover relevant clusters using **get_relevant_clusters_list_v2.pl**
+
+```
+perl get_relevant_clusters_list_v2.pl all_DB_clu.tsv BLDB_list > relevant_clusters
+````
+
+4. Recover the proteins contained in the relevant clusters using **get_esm_fasta.pl** and **MMSeqs2**
+
+```
+cut -f 2 relevant_clusters > relevant_proteins
+perl get_esm_fasta.pl all_DB relevant_proteins temp_dir > relevant_proteins.faa
+```
