@@ -23,3 +23,22 @@ bwa-mem2 mem -o [mapping.sam] -t 16 [GRCh38 reference] [trimmed_R1] [trimmed_R2]
 perl /media/databases/exclude_human_illumina.pl [mapping.sam]
 ```
 5. Your reads are now ready for further analysis and/or assembly. Delete [mapping.sam]
+
+## Assemble your reads using PLASS and filter out partial proteins
+
+1. Assuming your reads are already trimmed and filtered out of human contamination, run **PLASS**
+
+```
+plass assemble [R1] [R2] [assembly.faa] [temp_dir] --remove-tmp-files
+```
+
+2. Filter out partial proteins using **plass_orf_filter.pl**
+
+```
+perl plass_orf_filter.pl [assembly.faa] [PREFIX] [minimun protein length] [maximum protein length]
+```
+3. After the script is done, you will have 3 output in your current directory. [PREFIX]_complete_orfs.faa is the one appropiate for further usage.
+	- [PREFIX]_complete_orfs.faa
+	- [PREFIX]_semi-partial_orfs.faa
+	- [PREFIX]_partial_orfs.faa
+
