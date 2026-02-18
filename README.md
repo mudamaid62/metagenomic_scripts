@@ -133,16 +133,17 @@ args_oap make_db -i proteins.faa
 
 - Read files must be in a single directory and be called sample_name_1.fastq.gz and sample_name_2.fastq.gz
 - Create a structure file for your proteins (tab-separated), where the first column has the header Protein and all protein names, and any ammount of extra columns (at least one) where cluster types are specicified
-- e.g.
----
-| ----------- | ----------- |
+e.g.
 | Protein | Cluster |
+| ----------- | ----------- |
 | prot_A | cluster_A |
+| ----------- | ----------- |
 | prot_B | cluster_A |
+| ----------- | ----------- |
 | prot_C | cluster_B |
+| ----------- | ----------- |
 | prot_D | cluster_B |
 | ----------- | ----------- |
----
 
 ```
 args_oap stage_one -i [reads_directory] -o [args_oap_out] -t 16 -f fastq --database proteins.faa
