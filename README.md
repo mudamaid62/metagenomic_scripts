@@ -145,4 +145,53 @@ args_oap stage_one -i [reads_directory] -o [args_oap_out] -t 16 -f fastq --datab
 args_oap stage_two -i [args_oap_out]  -t 16 --database proteins.faa --structure1 proteins_structure.txt
 ```
 
-4. Run **fasta_to_fastq.pl** to recover the reads from the args_oap output
+4. Run **fasta_to_fastq.pl** to recover the reads mapping to the proteins from the args_oap output
+
+```
+perl fasta_to_fastq.pl args_oap_out/extracted.filtered.fa [RAT_1.fastq] [RAT_2.fastq] [RAT_single.fastq]
+```
+
+5. Get taxonomic classifications from the paired end reads using **RAT**
+
+```
+CAT_pack reads -c metaspades_contigs.fa -t cat_database/tax/ -m cr -o [RAT_paired] -1 [RAT_1.fastq] -2 [RAT_2.fastq] -d cat_database/db/ --no_stars -n 16 --sensitive --block_size 6 --tmpdir temp --c2c contigs_CAT.contig2classification.txt
+```
+
+6. Use the modified CAT_pack script included in this repo to run RAT using single end reads
+
+```
+CAT_pack reads -c metaspades_contigs.fa -t cat_database/tax/ -m cr -o [RAT_single] -1 [RAT_single.fastq] -d cat_database/db/ --no_stars -n 16 --sensitive --block_size 6 --tmpdir temp/ --c2c contigs_CAT.contig2classification.txt
+```
+
+7. Run **SingleM** microbial_fraction mode using all the metagenomic reads (NOT THE RAT READS) to get the estimated prokaryote genome size and number of prokaryotic bases
+
+```
+singlem pipe -1 [sample_name_1.fastq.gz] -2 [sample_name_2.fastq.gz] -p [taxonomic_profile] --otu-table [OTU_table] --threads 16
+singlem microbial_fraction -1 [sample_name_1.fastq.gz] -2 [sample_name_2.fastq.gz] -p [taxonomic profile] > sample_name_smf
+```
+8. Create a **MMSeqs2** for your proteins
+
+```
+mmseqs createdb proteins.faa proteins_DB
+```
+
+9. Run **MMSeqs2** using the RAT reads as queries against the proteins
+
+```
+mmseqs easy-search [RAT_1.fastq] proteins_DB [RAT_1.m8] tmp --alignment-mode 3 -s 7 --format-output "query,target,pident,qcov,tcov,evalue,bits,qlen,tlen,alnlen" --remove-tmp-files
+mmseqs easy-search [RAT_2.fastq] proteins_DB [RAT_2.m8] tmp --alignment-mode 3 -s 7 --format-output "query,target,pident,qcov,tcov,evalue,bits,qlen,tlen,alnlen" --remove-tmp-files
+mmseqs easy-search [RAT_single.fastq] proteins_DB [RAT_single.m8] tmp --alignment-mode 3 -s 7 --format-output "query,target,pident,qcov,tcov,evalue,bits,qlen,tlen,alnlen" --remove-tmp-files
+```
+
+10. Concatenate files
+
+```
+cat *_RAT_*.m8 > reads.m8
+cat *read2classification.txt > read2classification.txt
+```
+
+11. Run **get_abundance_and_taxonomy.pl** to quantify proteins in copies/cell and get taxonomic classifications for each protein based on the LCA of all reads that map to them. The RAT_otu_table output is usefull is you want to calculate alpha-diversity metrics for each protein aftewards.
+
+```
+perl get_abundance_and_taxonomy.pl [sample_name_smf] [read2classification.txt] [reads.m8] [RAT_otu_table] > RAT_abundance_and_tax
+```
