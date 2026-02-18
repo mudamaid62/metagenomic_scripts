@@ -198,4 +198,36 @@ cat *read2classification.txt > read2classification.txt
 perl get_abundance_and_taxonomy.pl [sample_name_smf] [read2classification.txt] [reads.m8] [RAT_otu_table] > RAT_abundance_and_tax
 ```
 
-## Clusterize proteins according to predicted GO-terms based functional similarites (**NOTE**: the current version of 
+## Get functional similarities between proteins based on GO-terms probability vectors (**NOTE**: The functional similarity corresponds to the cosine between two vectors)
+
+1. Get a multifasta of proteins you would like to compare. If you have too many proteins (>1000 sequences) it is recommended to split it in smaller packets, otherwise AnnoPro will crash. To split your multifasta file run **split_fasta_in_packets.pl**
+
+```
+perl split_fasta_in_packets.pl [input FASTA] [PACKET_PREFIX] 1000 
+```
+
+2. Make sure all your proteins are at least 30 aa in length. You can check this running **fasta_len.pl**. This script will print a length histogram to the STDERR, and the specific length of every protein to the STDOUT
+
+```
+perl fasta_len.pl [input FASTA] [histogram bin width e.g. 100] > protein_lengths
+```
+
+3. Run AnnoPro for all your proteins
+
+```
+annopro --fasta_file [input FASTA] --output [annopro_outdir]
+```
+
+4. Concatenate all AnnoPro results
+
+```
+cat [annopro_outdir]/*.csv > all_annopro_result.csv
+```
+
+5. Calculate functional similarities running **make_annopro_matrices.pl**. The similarity-matrix output can be used to make a heatmap representation, the go-matrix output can be used to make an UMAP, and the table output shows the specific functional similarity between each available pair of proteins
+
+```
+perl make_annopro_matrices.pl [all_annopro_result.csv] [similarity matrix output] [GO-matrix output] [Similarity table output]
+```
+
+## (iMETA PUBLICATION ONLY) Make ROC tables
