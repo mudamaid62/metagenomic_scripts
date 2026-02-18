@@ -229,7 +229,7 @@ cat [annopro_outdir]/*.csv > all_annopro_result.csv
 ```
 perl make_annopro_matrices.pl [all_annopro_result.csv] [similarity matrix output] [GO-matrix output] [Similarity table output]
 ```
-
+---
 ## (iMETAOMICS PUBLICATION ONLY) Make ROC tables
 
 1. Make MSAs for each BLA class using **MAFFT**. First, the BLDB is divided into 6 multifasta files, one for each class, then run MAFFT for each of them
@@ -245,7 +245,7 @@ hmmbuild -n [HMM name] --amino --cpu 16 [blas.hmm] [blas.aln]
 hmmpress [blas.hmm]
 ```
 
-3. Run hmmscan against all assmbled metagenomic proteins (PLASS + metaSPAdes) with each HMM
+3. Run hmmscan against all assembled metagenomic proteins (PLASS + metaSPAdes) with each HMM
 
 ```
 hmmscan --tblout [hmmscan_out] --notextw --cpu 16 [HMM] [metagenomic_proteins.faa]
@@ -254,7 +254,38 @@ hmmscan --tblout [hmmscan_out] --notextw --cpu 16 [HMM] [metagenomic_proteins.fa
 4. Concatanate all hmmscan results and rename the first column
 
 ```
-cat *_hmmscan | sed 's/.hmm//g' > all_raw_hmmscan_result
+cat *_hmmscan | sed 's/.aln//g' > all_raw_hmmscan_result
 ```
 
-5
+5. Make sure there is only one hmmscan result per query using **make_unique_hmmscan_result.pl**
+
+```
+perl make_unique_hmmscan_result.pl [all_raw_hmmscan_result] > all_unique_hmmscan_result
+```
+
+6. Calculate the ROC curve for the HMMER result (**NOTE**: "Antarctic BLAs consensus table" is not yet available for public sharing)
+
+```
+perl get_ROC_table_hmm.pl [Antarctic BLAs consensus table] [all_unique_hmmscan_result] [potential_blas_list] [missed_blas_list] > hmmer_ROC_table
+```
+
+7. Run MMSeqs2 using all assembled metagenomic proteins (PLASS + metaSPAdes) as queries and BLDB proteins as targets
+
+```
+mmseqs createdb BLDB.faa bldb_DB
+mmseqs easy-search [metagenomic_proteins.faa] [bldb_DB] [metagenomic_proteins.m8] [temp] --alignment-mode 3 -s 7.5 --format-output query,qlen,target,tlen,qstart,qend,tstart,tend,evalue,bits,pident,qcoc,tcov --max-seqs 2300 --remove-tmp-files
+```
+
+8. Run **get_best_hit_parallel.pl** to find the best hit for each query protein according to the bitscore
+
+```
+perl get_best_hit_parallel.pl [metagenomic_proteins.m8] 0 0 0 0 1000 128 [temp_dir] > metagenomic_proteins_best.m8
+cut -f 2-15 metagenomic_proteins_best.m8 > temp_file
+mv temp_file metagenomic_proteins_best.m8
+```
+9. Calculate the ROC curve for the MMSeqs2 result (**NOTE**: "Antarctic BLAs consensus table" is not yet available for public sharing)
+
+```
+perl get_ROC_table_mmseqs.pl [Antarctic BLAs consensus table] [metagenomic_proteins_best.m8] [potential_blas_list] [missed_blas_list] > mmseqs_ROC_table
+```
+---
