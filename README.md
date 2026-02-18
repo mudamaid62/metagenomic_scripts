@@ -117,7 +117,7 @@ perl get_esm_fasta.pl all_DB relevant_proteins temp_dir > relevant_proteins.faa
 
 ## Quantify genes/proteins in copies/cell and get related taxonomies
 
-1. Run **CAT** with metaSPAdes assembled contigs to get classify contig taxonomic classifications
+1. Run **CAT** with metaSPAdes assembled contigs to get contig taxonomic classifications
 
 ```
 CAT_pack contigs -c metaspades_contigs.fa -d cat_database/db/ -t cat_database/tax/ --no_stars -n 16 --sensitive --block_size 2 --tmpdir temp -o contigs_CAT
