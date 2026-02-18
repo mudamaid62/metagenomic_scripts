@@ -1,7 +1,7 @@
 # Metagenomic Scripts
 Custom perl scripts used to calculate diversity indices, functional similarities and other related stuff
  
-### Filter out human contamination from metagenomic reads
+## Filter out human contamination from metagenomic reads
 
 1. First, check your Illumina reads using **FASTQC**, determine your read length and how many low quality bases are both on the front and tail of the reads.
 
@@ -197,3 +197,5 @@ cat *read2classification.txt > read2classification.txt
 ```
 perl get_abundance_and_taxonomy.pl [sample_name_smf] [read2classification.txt] [reads.m8] [RAT_otu_table] > RAT_abundance_and_tax
 ```
+
+## Clusterize proteins according to predicted GO-terms based functional similarites (**NOTE**: the current version of 
