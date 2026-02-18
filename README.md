@@ -1,9 +1,9 @@
 # Metagenomic Scripts
 Custom perl scripts used to calculate diversity indices, functional similarities and other related stuff
  
-## Filter out human contamination from metagenomic reads
+### Filter out human contamination from metagenomic reads
 
-1. First, check your Illumina reads using **FASTQC**, and determine your read length and how many low quality bases are both on the front and tail of the reads.
+1. First, check your Illumina reads using **FASTQC**, determine your read length and how many low quality bases are both on the front and tail of the reads.
 
 2. Run **fastp**, we will assumme that both the front and tail have 5 low quality bases, and that our reads are 150 bp, using 16 threads. 
 
@@ -17,7 +17,7 @@ fastp --in1 [R1] --in2 [R2] --out1 [trimmed_R1] --out2 [trimmed_R2] -z 9 -V -f 5
 bwa-mem2 mem -o [mapping.sam] -t 16 [GRCh38 reference] [trimmed_R1] [trimmed_R2]
 ```
 
-4. Filter out the human contamination using **exclude_human_illumina.pl**
+4. Filter out the human contamination using **exclude_human_illumina.pl** and **SAMTools**
 
 ```
 perl /media/databases/exclude_human_illumina.pl [mapping.sam]
@@ -39,7 +39,7 @@ plass assemble [R1] [R2] [assembly.faa] [temp_dir] --remove-tmp-files
 perl plass_orf_filter.pl [assembly.faa] [PREFIX] [minimun protein length] [maximum protein length]
 ```
 
-3. After the script is done, you will have 3 output in your current directory. [PREFIX]_complete_orfs.faa is the one appropiate for further usage.
+3. After the script is done, you will have 3 output files in your current directory. [PREFIX]_complete_orfs.faa is the one appropiate for further usage.
 	- [PREFIX]_complete_orfs.faa
 	- [PREFIX]_semi-partial_orfs.faa
 	- [PREFIX]_partial_orfs.faa
@@ -66,7 +66,7 @@ perl filter_by_length.pl metaspades_assembly/contigs.fasta [minimun contig lengt
 singlem pipe -1 [R1] -2 [R2] -p [taxonomic_profile] --otu-table [OTU_table] --threads 16
 ```
 
-2. Summarise the profile output in tables by taxonomic levels, to then plot community stack plots. You can summarise multiple profile outputs at once.
+2. Summarise the profile output in tables by taxonomic level, to then plot community stack plots. You can summarise multiple profile outputs at once.
 
 ```
 singlem summarise --input-taxonomic-profiles [taxonomic_profiles] --output-species-by-site-relative-abundance-prefix [PREFIX]
@@ -123,7 +123,7 @@ perl get_esm_fasta.pl all_DB relevant_proteins temp_dir > relevant_proteins.faa
 CAT_pack contigs -c metaspades_contigs.fa -d cat_database/db/ -t cat_database/tax/ --no_stars -n 16 --sensitive --block_size 2 --tmpdir temp -o contigs_CAT
 ```
 
-2. Use **ARGs_OAP** to build a database from a Proteins to quantify multifasta 
+2. Use **ARGs_OAP** to build a database from a proteins-to-quantify multifasta 
 
 ```
 args_oap make_db -i proteins.faa
@@ -165,13 +165,13 @@ CAT_pack reads -c metaspades_contigs.fa -t cat_database/tax/ -m cr -o [RAT_paire
 CAT_pack reads -c metaspades_contigs.fa -t cat_database/tax/ -m cr -o [RAT_single] -1 [RAT_single.fastq] -d cat_database/db/ --no_stars -n 16 --sensitive --block_size 6 --tmpdir temp/ --c2c contigs_CAT.contig2classification.txt
 ```
 
-7. Run **SingleM** microbial_fraction mode using all the metagenomic reads (NOT THE RAT READS) to get the estimated prokaryote genome size and number of prokaryotic bases
+7. Run **SingleM** in microbial_fraction mode using all the metagenomic reads (NOT THE RAT READS) to get the estimated prokaryote genome size and number of prokaryotic bases
 
 ```
 singlem pipe -1 [sample_name_1.fastq.gz] -2 [sample_name_2.fastq.gz] -p [taxonomic_profile] --otu-table [OTU_table] --threads 16
 singlem microbial_fraction -1 [sample_name_1.fastq.gz] -2 [sample_name_2.fastq.gz] -p [taxonomic profile] > sample_name_smf
 ```
-8. Create a **MMSeqs2** for your proteins
+8. Create a **MMSeqs2** database for your proteins
 
 ```
 mmseqs createdb proteins.faa proteins_DB
@@ -188,11 +188,11 @@ mmseqs easy-search [RAT_single.fastq] proteins_DB [RAT_single.m8] tmp --alignmen
 10. Concatenate files
 
 ```
-cat *_RAT_*.m8 > reads.m8
+cat RAT_*.m8 > reads.m8
 cat *read2classification.txt > read2classification.txt
 ```
 
-11. Run **get_abundance_and_taxonomy.pl** to quantify proteins in copies/cell and get taxonomic classifications for each protein based on the LCA of all reads that map to them. The RAT_otu_table output is usefull is you want to calculate alpha-diversity metrics for each protein aftewards.
+11. Run **get_abundance_and_taxonomy.pl** to quantify proteins in copies/cell and get taxonomic classifications for each protein based on the LCA of all reads that map to them. The RAT_otu_table output is useful if you want to calculate alpha-diversity metrics for each protein afterwards.
 
 ```
 perl get_abundance_and_taxonomy.pl [sample_name_smf] [read2classification.txt] [reads.m8] [RAT_otu_table] > RAT_abundance_and_tax
