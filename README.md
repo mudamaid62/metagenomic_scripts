@@ -230,4 +230,31 @@ cat [annopro_outdir]/*.csv > all_annopro_result.csv
 perl make_annopro_matrices.pl [all_annopro_result.csv] [similarity matrix output] [GO-matrix output] [Similarity table output]
 ```
 
-## (iMETA PUBLICATION ONLY) Make ROC tables
+## (iMETAOMICS PUBLICATION ONLY) Make ROC tables
+
+1. Make MSAs for each BLA class using **MAFFT**. First, the BLDB is divided into 6 multifasta files, one for each class, then run MAFFT for each of them
+
+```
+mafft --globalpair --maxiterate 1000 --thread 16 [blas.faa] > [blas.aln]
+```
+
+2. Build a HMM using **HMMER** for each MSA
+
+```
+hmmbuild -n [HMM name] --amino --cpu 16 [blas.hmm] [blas.aln]
+hmmpress [blas.hmm]
+```
+
+3. Run hmmscan against all assmbled metagenomic proteins (PLASS + metaSPAdes) with each HMM
+
+```
+hmmscan --tblout [hmmscan_out] --notextw --cpu 16 [HMM] [metagenomic_proteins.faa]
+```
+
+4. Concatanate all hmmscan results and rename the first column
+
+```
+cat *_hmmscan | sed 's/.hmm//g' > all_raw_hmmscan_result
+```
+
+5
