@@ -263,10 +263,10 @@ cat *_hmmscan | sed 's/.aln//g' > all_raw_hmmscan_result
 perl make_unique_hmmscan_result.pl [all_raw_hmmscan_result] > all_unique_hmmscan_result
 ```
 
-6. Calculate the ROC curve for the HMMER result (**NOTE**: "Antarctic BLAs consensus table" is not yet available for public sharing)
+6. Calculate the ROC curve for the HMMER result
 
 ```
-perl get_ROC_table_hmm.pl [Antarctic BLAs consensus table] [all_unique_hmmscan_result] [potential_blas_list] [missed_blas_list] > hmmer_ROC_table
+perl get_ROC_table_hmm.pl Coche_2026_database/Coche_2026_metadata.txt [all_unique_hmmscan_result] [potential_blas_list] [missed_blas_list] > hmmer_ROC_table
 ```
 
 7. Run MMSeqs2 using all assembled metagenomic proteins (PLASS + metaSPAdes) as queries and BLDB proteins as targets
@@ -283,9 +283,9 @@ perl get_best_hit_parallel.pl [metagenomic_proteins.m8] 0 0 0 0 1000 128 [temp_d
 cut -f 2-15 metagenomic_proteins_best.m8 > temp_file
 mv temp_file metagenomic_proteins_best.m8
 ```
-9. Calculate the ROC curve for the MMSeqs2 result (**NOTE**: "Antarctic BLAs consensus table" is not yet available for public sharing)
+9. Calculate the ROC curve for the MMSeqs2 result
 
 ```
-perl get_ROC_table_mmseqs.pl [Antarctic BLAs consensus table] [metagenomic_proteins_best.m8] [potential_blas_list] [missed_blas_list] > mmseqs_ROC_table
+perl get_ROC_table_mmseqs.pl Coche_2026_database/Coche_2026_metadata.txt [metagenomic_proteins_best.m8] [potential_blas_list] [missed_blas_list] > mmseqs_ROC_table
 ```
 ---
