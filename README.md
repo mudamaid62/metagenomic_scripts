@@ -23,7 +23,7 @@ bwa-mem2 mem -o [mapping.sam] -t 16 [GRCh38 reference] [trimmed_R1] [trimmed_R2]
 perl /media/databases/exclude_human_illumina.pl [mapping.sam]
 ```
 
-5. Your reads are now ready for further analysis and/or assembly. Delete [mapping.sam]
+5. Your reads are now ready for further analysis and/or assembly.
 
 ## Assemble your reads using PLASS and filter out partial proteins
 
