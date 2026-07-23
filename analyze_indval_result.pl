@@ -58,7 +58,7 @@ while(my $x = <INDVAL>){
 	my $tax_to_solve = "placeholder";
 	my @abundances;
 	my @counts;
-	my @names = ("semifrozen","SCp1","SCp2","SCp3","moraine","Mp1","Mp3","rizo","Rp1","Rp2","Rp3");
+	my @names = ("SCp1","SCp2","SCp3","Mp1","Mp3","Rp1","Rp2","Rp3");
 	foreach my $n(@names){
 		my $name = "$n~$protein";
 		my $default = 0;
