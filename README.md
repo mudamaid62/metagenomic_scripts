@@ -195,7 +195,7 @@ cat *read2classification.txt > read2classification.txt
 11. Run **get_abundance_and_taxonomy.pl** to quantify proteins in copies/cell and get taxonomic classifications for each protein based on the LCA of all reads that map to them. The RAT_otu_table output is useful if you want to calculate alpha-diversity metrics for each protein afterwards.
 
 ```
-perl get_abundance_and_taxonomy.pl [sample_name_smf] [read2classification.txt] [reads.m8] [RAT_otu_table] > RAT_abundance_and_tax
+perl get_abundance_and_taxonomy.pl --smf [sample_name_smf] --r2c [read2classification.txt] --m8 [reads.m8] --otu_table [RAT_otu_table] > RAT_abundance_and_tax
 ```
 
 ## Get functional similarities between proteins based on GO-terms probability vectors (**NOTE**: The functional similarity corresponds to the cosine between two vectors)
